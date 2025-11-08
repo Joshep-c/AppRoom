@@ -1,25 +1,25 @@
-# 📱 AppRoom - Registro de Compras
+# AppRoom - Registro de Compras
 
 Aplicación Android para registrar y visualizar compras diarias utilizando **Room Database** y **Jetpack Compose**.
 
-## 📋 Descripción
+## Descripción
 
 AppRoom es una aplicación simple y funcional que permite a los usuarios:
-- ✅ Registrar compras con información del comprador, productos y precio
-- ✅ Visualizar una lista desplegable de todas las compras registradas
-- ✅ Persistencia de datos local usando Room Database
-- ✅ Generación automática de fecha y hora (formato 24h)
+- Registrar compras con información del comprador, productos y precio
+- Visualizar una lista desplegable de todas las compras registradas
+- Persistencia de datos local usando Room Database
+- Generación automática de fecha y hora (formato 24h)
 
-## 🎯 Características
+## Características
 
 ### Pantalla Principal
 - **Lista desplegable** de compras ordenadas por más recientes
 - Cada item muestra "Compra #ID" con flecha para expandir/contraer
 - Al expandir se muestra:
-  - 👤 Comprador
-  - 🛒 Productos
-  - 💰 Precio Total (S/.)
-  - 🕐 Fecha (HH:mm en formato 24 horas)
+  - Comprador
+  - Productos
+  - Precio Total (S/.)
+  - Fecha (HH:mm en formato 24 horas)
 - **Botón flotante (+)** para agregar nueva compra
 - Mensaje cuando no hay compras registradas
 
@@ -157,7 +157,7 @@ dependencies {
    - Conectar dispositivo o iniciar emulador
    - Run → Run 'app' (Shift + F10)
 
-## 📱 Uso de la Aplicación
+## Uso de la Aplicación
 
 ### Agregar una Compra
 1. Presiona el botón flotante **+** en la esquina inferior derecha
@@ -178,7 +178,7 @@ dependencies {
    - Precio Total: $XX.XX
    - Fecha: HH:mm
 
-## 🗃️ Base de Datos
+## Base de Datos
 
 ### Esquema
 - **Nombre**: `compra_database`
@@ -194,7 +194,7 @@ dependencies {
 | precioTotal | REAL | Precio en formato double |
 | fecha | TEXT | Hora en formato HH:mm |
 
-## 🎨 Diseño UI
+## Diseño UI
 
 - **Material Design 3**: Componentes modernos y accesibles
 - **Theme**: Configuración por defecto de Material 3
@@ -207,18 +207,7 @@ dependencies {
   - `OutlinedTextField`: Campos de entrada
   - `AnimatedVisibility`: Animaciones suaves
 
-## 🧪 Testing
-
-### Para ejecutar tests
-```bash
-# Tests unitarios
-./gradlew test
-
-# Tests de instrumentación
-./gradlew connectedAndroidTest
-```
-
-## 📝 Notas Técnicas
+## Notas Técnicas
 
 ### Patrones Utilizados
 - **MVVM** (Model-View-ViewModel)
@@ -236,64 +225,9 @@ dependencies {
 - `suspend functions`: Operaciones asíncronas
 - `launch`: Lanzamiento de corrutinas
 
-## 🐛 Troubleshooting
+## Autor
 
-### Error: "Unresolved reference 'navigation'"
-**Solución**: Sincroniza el proyecto con Gradle
-- File → Sync Project with Gradle Files
-
-### Error: "Room schema export directory is not provided"
-**Solución**: Ya está configurado `exportSchema = false`
-
-### La app crashea al iniciar
-**Verificar**:
-- Min SDK del dispositivo >= 24
-- Permisos en AndroidManifest.xml
-- Logs en Logcat
-
-### Los datos no se guardan
-**Verificar**:
-- Campos no estén vacíos
-- Conexión a base de datos exitosa
-- Revisar logs de Room
-
-## 🔮 Futuras Mejoras
-
-- [ ] Búsqueda y filtrado de compras
-- [ ] Edición de compras existentes
-- [ ] Eliminación de compras
-- [ ] Exportar datos a CSV/PDF
-- [ ] Estadísticas y gráficos
-- [ ] Categorías de productos
-- [ ] Modo oscuro personalizado
-- [ ] Backup en la nube
-- [ ] Multi-usuario
-
-## 👨‍💻 Desarrollo
-
-### Estructura de Commits Recomendada
-```
-feat: Nueva característica
-fix: Corrección de bug
-docs: Actualización de documentación
-style: Cambios de formato
-refactor: Refactorización de código
-test: Añadir tests
-```
-
-### Compilar APK de Release
-```bash
-./gradlew assembleRelease
-```
-APK generado en: `app/build/outputs/apk/release/`
-
-## 📄 Licencia
-
-Este proyecto es de código abierto y está disponible bajo licencia MIT.
-
-## 📞 Contacto y Soporte
-
-Para preguntas, sugerencias o reportar bugs, abre un issue en el repositorio.
+Joshep Antony Ccahuana Larota
 
 ---
 
