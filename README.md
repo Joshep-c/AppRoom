@@ -31,7 +31,7 @@ AppRoom es una aplicación simple y funcional que permite a los usuarios:
 - Validación de campos requeridos
 - Navegación automática a lista después de guardar
 
-## 🏗️ Arquitectura
+## Arquitectura
 
 El proyecto sigue las mejores prácticas de Android con:
 
@@ -94,7 +94,7 @@ data class Compra(
 | **StateFlow** | Latest | Manejo de estado reactivo |
 | **KSP** | 2.0.21-1.0.28 | Procesamiento de anotaciones |
 
-## 📦 Dependencias
+## Dependencias
 
 ### build.gradle.kts (Project)
 ```kotlin
@@ -125,7 +125,7 @@ dependencies {
 }
 ```
 
-## 🚀 Instalación y Configuración
+## Instalación y Configuración
 
 ### Requisitos Previos
 - **Android Studio**: Hedgehog (2023.1.1) o superior
@@ -228,10 +228,3 @@ dependencies {
 ## Autor
 
 Joshep Antony Ccahuana Larota
-
----
-
-**Desarrollado con ❤️ usando Kotlin & Jetpack Compose**
-
-*Última actualización: Noviembre 2025*
-
