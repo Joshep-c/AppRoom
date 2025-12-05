@@ -29,9 +29,42 @@ import com.dbApp.approom.data.CompraRepository
 import com.dbApp.approom.screens.FormularioScreen
 import com.dbApp.approom.ui.theme.AppRoomTheme
 
+import android.Manifest
+import android.content.pm.PackageManager
+import android.os.Build
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.ContextCompat
+import androidx.work.*
+import java.util.concurrent.TimeUnit
+
 class MainActivity : ComponentActivity() {
+
+    private val requestPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { isGranted: Boolean ->
+        if (isGranted) {
+            iniciarNotificacionesPeriodicas()
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        // Solicitar permisos de notificación en Android 13+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(
+                    this,
+                    Manifest.permission.POST_NOTIFICATIONS
+                ) != PackageManager.PERMISSION_GRANTED
+            ) {
+                requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+            } else {
+                iniciarNotificacionesPeriodicas()
+            }
+        } else {
+            iniciarNotificacionesPeriodicas()
+        }
+
         enableEdgeToEdge()
         setContent {
             AppRoomTheme {
@@ -46,112 +79,127 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
-}
 
-@Composable
-fun AppNavigation(viewModel: CompraViewModel) {
-    val navController = rememberNavController()
 
-    NavHost(navController = navController, startDestination = "lista") {
-        composable("lista") {
-            ListaComprasScreen(
-                viewModel = viewModel,
-                onAgregarClick = { navController.navigate("formulario") }
-            )
-        }
-        composable("formulario") {
-            FormularioScreen(
-                navController = navController,
-                viewModel = viewModel
-            )
+    private fun iniciarNotificacionesPeriodicas() {
+        // Configurar WorkManager para notificaciones periódicas cada 15 minutos (mínimo permitido)
+        val workRequest = PeriodicWorkRequestBuilder<NotificacionWorker>(
+            15, TimeUnit.MINUTES
+        ).build()
+
+        WorkManager.getInstance(this).enqueueUniquePeriodicWork(
+            "notificaciones_compras",
+            ExistingPeriodicWorkPolicy.KEEP,
+            workRequest
+        )
+    }
+
+
+    @Composable
+    fun AppNavigation(viewModel: CompraViewModel) {
+        val navController = rememberNavController()
+
+        NavHost(navController = navController, startDestination = "lista") {
+            composable("lista") {
+                ListaComprasScreen(
+                    viewModel = viewModel,
+                    onAgregarClick = { navController.navigate("formulario") }
+                )
+            }
+            composable("formulario") {
+                FormularioScreen(
+                    navController = navController,
+                    viewModel = viewModel
+                )
+            }
         }
     }
-}
 
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun ListaComprasScreen(
-    viewModel: CompraViewModel,
-    onAgregarClick: () -> Unit
-) {
-    val compras by viewModel.compras.collectAsState()
+    @OptIn(ExperimentalMaterial3Api::class)
+    @Composable
+    fun ListaComprasScreen(
+        viewModel: CompraViewModel,
+        onAgregarClick: () -> Unit
+    ) {
+        val compras by viewModel.compras.collectAsState()
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text("Compras del día") }
-            )
-        },
-        floatingActionButton = {
-            FloatingActionButton(onClick = onAgregarClick) {
-                Icon(Icons.Default.Add, contentDescription = "Agregar compra")
+        Scaffold(
+            topBar = {
+                TopAppBar(
+                    title = { Text("Compras del día") }
+                )
+            },
+            floatingActionButton = {
+                FloatingActionButton(onClick = onAgregarClick) {
+                    Icon(Icons.Default.Add, contentDescription = "Agregar compra")
+                }
             }
-        }
-    ) { padding ->
-        if (compras.isEmpty()) {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(padding),
-                contentAlignment = Alignment.Center
-            ) {
-                Text("No hay compras registradas")
-            }
-        } else {
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(padding),
-                contentPadding = PaddingValues(16.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                items(compras) { compra ->
-                    CompraItem(compra)
+        ) { padding ->
+            if (compras.isEmpty()) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(padding),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text("No hay compras registradas")
+                }
+            } else {
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(padding),
+                    contentPadding = PaddingValues(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    items(compras) { compra ->
+                        CompraItem(compra)
+                    }
                 }
             }
         }
     }
-}
 
-@Composable
-fun CompraItem(compra: Compra) {
-    var expanded by remember { mutableStateOf(false) }
+    @Composable
+    fun CompraItem(compra: Compra) {
+        var expanded by remember { mutableStateOf(false) }
 
-    Card(
-        modifier = Modifier.fillMaxWidth()
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clickable { expanded = !expanded }
-                .padding(16.dp)
+        Card(
+            modifier = Modifier.fillMaxWidth()
         ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable { expanded = !expanded }
+                    .padding(16.dp)
             ) {
-                Text(
-                    text = "Compra ${compra.id}",
-                    style = MaterialTheme.typography.titleMedium
-                )
-                Icon(
-                    imageVector = if (expanded) Icons.Default.KeyboardArrowDown else Icons.Default.KeyboardArrowRight,
-                    contentDescription = if (expanded) "Contraer" else "Expandir"
-                )
-            }
-
-            AnimatedVisibility(visible = expanded) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 8.dp),
-                    verticalArrangement = Arrangement.spacedBy(4.dp)
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text("Comprador: ${compra.comprador}")
-                    Text("Productos: ${compra.productos}")
-                    Text("Precio Total: S/. ${String.format("%.2f", compra.precioTotal)}")
-                    Text("Fecha: ${compra.fecha}")
+                    Text(
+                        text = "Compra ${compra.id}",
+                        style = MaterialTheme.typography.titleMedium
+                    )
+                    Icon(
+                        imageVector = if (expanded) Icons.Default.KeyboardArrowDown else Icons.Default.KeyboardArrowRight,
+                        contentDescription = if (expanded) "Contraer" else "Expandir"
+                    )
+                }
+
+                AnimatedVisibility(visible = expanded) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 8.dp),
+                        verticalArrangement = Arrangement.spacedBy(4.dp)
+                    ) {
+                        Text("Comprador: ${compra.comprador}")
+                        Text("Productos: ${compra.productos}")
+                        Text("Precio Total: S/. ${String.format("%.2f", compra.precioTotal)}")
+                        Text("Fecha: ${compra.fecha}")
+                    }
                 }
             }
         }
